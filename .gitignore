@@ -1,0 +1,6 @@
+__pycache__/
+/data/raw/*.csv
+/data/processed/*.csv
+/lake/__pycache__/
+/warehouse/__pycache__/
+/etl/__pycache__/
