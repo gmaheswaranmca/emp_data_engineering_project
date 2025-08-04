@@ -53,9 +53,19 @@ def load_to_warehouse(df_employees, df_department_salaries, config):
     collection.insert_many(df_department_salaries.to_dict('records'))
     print(f"department_salaries loaded successfully into MongoDB `warehouse` database.")
 
+def load(config, load_fn, dfs, isLake = False):
+    employees_df = dfs[0]
+    # If loading to lake, only one DataFrame is passed
+    if isLake:        
+        load_fn(employees_df, config)
+    # If loading to warehouse, two DataFrames are passed
+    else:
+        df_department_salaries = dfs[1]
+        load_fn(employees_df, df_department_salaries, config)
 
 
-def extract_data(config):       
+def extract(config): 
+    file_name = config['emp_csv_file']      
     if os.path.exists(file_name):
         # read the CSV file locally
         url = config['emp_csv_url']
@@ -63,7 +73,7 @@ def extract_data(config):
         print('Local Employees Data extracted successfully.')
     elif config['source'] == 'csv':
         # read the CSV file from the URL, save locally
-        file_name = config['emp_csv_file']
+        
         df = pd.read_csv(file_name)
         print('URL Employees Data extracted successfully.')
     elif config['source'] == 'api':
@@ -76,15 +86,6 @@ def extract_data(config):
     
     return df
 
-def load(config, load_fn, dfs, isLake = False):
-    employees_df = dfs[0]
-    # If loading to lake, only one DataFrame is passed
-    if isLake:        
-        load_fn(employees_df, config)
-    # If loading to warehouse, two DataFrames are passed
-    else:
-        df_department_salaries = dfs[1]
-        load_fn(employees_df, df_department_salaries, config)
 
 def transform(lake_employees_df):
     """
